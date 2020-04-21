@@ -2,8 +2,8 @@ package Parking
 
 import (
 	"fmt"
-	"github.com/goParkingLot/Car"
-	"github.com/goParkingLot/Slot"
+	"github.com/goParkingLot/Parking_Lot_problem/Car"
+	"github.com/goParkingLot/Parking_Lot_problem/Slot"
 	//log "github.com/sirupsen/logrus"
 )
 

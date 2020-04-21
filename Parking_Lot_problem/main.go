@@ -2,8 +2,8 @@ package main
 
 import (
 	//"fmt"
-	"github.com/goParkingLot/Car"
-	"github.com/goParkingLot/parkingLot"
+	"github.com/goParkingLot/Parking_Lot_problem/Car"
+	"github.com/goParkingLot/Parking_Lot_problem/parkingLot"
 	//"github.com/goParkingLot/types"
 )
 
