@@ -12,3 +12,6 @@
   * Just to try out as function `GetSLotsWIthReg` was implemented
  
  * To use this code just run main.go
+ 
+ ## Disclaimer ##
+ Failure cases for subpoints 5 and 6 are not implemented
