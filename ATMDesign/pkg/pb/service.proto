@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = ";pb";
+message RegisterRequest{
+	string name =1;
+	int32 pin=2;
+	DepositMoney money=3;
+}
+message RegisterResponse{
+	int32 id =1;
+}
+
+message DepositMoney{
+	int32 money =1;
+}
+message BankBalanceRequest{}
+
+message BankBalanceResponse{
+	DepositMoney money=1;
+}
+
+message AuthenticateRequest{
+	map <string,int32> req =1;		
+}
+message AuthenticateResponse{
+	bool authenticated =1;
+}
+
+service RegisterToBankService {
+	rpc RegisterTBank(RegisterRequest) returns (RegisterResponse){}
+}
+service DepositService{
+	rpc Deposit(DepositMoney) returns (BankBalanceResponse){}
+}
+
+service BankBalanceService{
+	rpc BankBalance(BankBalanceRequest) returns (BankBalanceResponse){}
+}
+
+service AuthenticateService{
+	rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse){}
+}
+
+service WithdrawService{
+	rpc WithDraw(DepositMoney)returns (BankBalanceResponse){}
+}
