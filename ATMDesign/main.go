@@ -72,13 +72,12 @@ func main() {
 				}
 			}
 		}
-	}else {
+	} else {
 		fmt.Println(verify)
 	}
 	//c := make(chan os.Signal)
 	//signal.Notify(c, os.Interrupt)
 	//<-c
 	//fmt.Println("Terminating the op...")
-
 
 }

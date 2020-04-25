@@ -1,24 +1,31 @@
 syntax = "proto3";
 
 package service;
+//import "github.com/infobloxopen/protoc-gen-gorm/options/gorm.proto";
+//import "github.com/infobloxopen/protoc-gen-gorm/types/types.proto";
 
 option go_package = ";pb";
 message RegisterRequest{
+//	option (gorm.opts) = {ormable: true, table: "atm_table"};
 	string name =1;
+// [(validate.rules).string = { min_len: 1 }, (gorm.field).tag = {primary_key: true}];
 	int32 pin=2;
-	DepositMoney money=3;
+	int32  money=3;
 }
 message RegisterResponse{
-	int32 id =1;
+	string id =1;
 }
 
 message DepositMoney{
 	int32 money =1;
+	string name=2;
 }
-message BankBalanceRequest{}
+message BankBalanceRequest{
+	string name=1;
+}
 
 message BankBalanceResponse{
-	DepositMoney money=1;
+	int32 money=1;
 }
 
 message AuthenticateRequest{
@@ -28,21 +35,11 @@ message AuthenticateResponse{
 	bool authenticated =1;
 }
 
-service RegisterToBankService {
+service BankService {
+//	option (gorm.server).autogen =true
 	rpc RegisterTBank(RegisterRequest) returns (RegisterResponse){}
-}
-service DepositService{
 	rpc Deposit(DepositMoney) returns (BankBalanceResponse){}
-}
-
-service BankBalanceService{
 	rpc BankBalance(BankBalanceRequest) returns (BankBalanceResponse){}
-}
-
-service AuthenticateService{
 	rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse){}
-}
-
-service WithdrawService{
 	rpc WithDraw(DepositMoney)returns (BankBalanceResponse){}
 }
