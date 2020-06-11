@@ -10,5 +10,5 @@ FROM alpine:latest AS runner
 RUN apk --no-cache add ca-certificates
 WORKDIR /bin
 COPY --from=builder /go/src/github.com/DesignQuestions-Go/ATMDesign/bin/server .
-
+Expose 50051
 ENTRYPOINT ["server"]

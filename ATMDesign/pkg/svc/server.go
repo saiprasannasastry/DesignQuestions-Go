@@ -24,11 +24,14 @@ func NewBankServer(database *sql.DB) pb.BankServiceServer {
 }
 
 func (r *BankServiceServer) RegisterTBank(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	tx, _ := r.db.Begin()
+	tx, err := r.db.Begin()
+	if err !=nil{
+		panic(err)
+	}
 	var resp string
 	rows := tx.QueryRow("select  name from atm where name = ?", req.GetName())
 
-	err := rows.Scan(&req.Name)
+	err = rows.Scan(&req.Name)
 	if err != nil && err != sql.ErrNoRows {
 		tx.Rollback()
 		log.Errorln(err)

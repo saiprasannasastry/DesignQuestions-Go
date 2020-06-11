@@ -10,12 +10,13 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"fmt"
 )
 
 func main() {
 
 	//doneC := make(chan error)
-	listener, err := net.Listen("tcp", "localhost:50051")
+	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Unable to listen on port :50051: %v", err)
 		//	doneC <- err
@@ -23,8 +24,8 @@ func main() {
 	opts := []grpc.ServerOption{}
 	s := grpc.NewServer(opts...)
 	var db *sql.DB
-
-	db, err = sql.Open("mysql", "root:infoblox@tcp(127.0.0.1:3306)/atmdesign")
+	DBURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"),os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+	db, err = sql.Open("mysql", DBURL)
 	if err != nil {
 		log.Fatalf("Unable to open db :%v", err)
 	}
