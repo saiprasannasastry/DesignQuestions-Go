@@ -150,14 +150,11 @@ func Cleaner(done chan bool) {
 	//worst case scenario where all are not completed
 	for i := 0; i < 10; i++ {
 
-		if len(list) == 0 || k == len(list) {
+		if len(list) == 0  {
 			fmt.Println("waiting for added to add tasks")
 			break
 		}
-		// never going to happen, just a check to mitigate panic
-		if k > len(list) {
-			k--
-		}
+
 		element := list[k]
 		if element.IsCompleted == true {
 			removeIndex(k)
