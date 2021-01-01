@@ -128,14 +128,11 @@ func Cleaner() {
 	// put it in error channel to crash the service
 	for {
 
-		if len(list) == 0 || k == len(list) {
+		if len(list) == 0  {
 			fmt.Println("waiting for added to add tasks")
 			break
 		}
-		// never going to happen, just a check to mitigate panic
-		if k > len(list) {
-			k--
-		}
+
 		element := list[k]
 		if element.IsCompleted == true {
 			removeIndex(k)
