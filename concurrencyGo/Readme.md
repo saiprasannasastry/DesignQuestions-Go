@@ -1,7 +1,5 @@
-//sample.go just defines a sample cases with 4 or 5 tasks added to give the user a better understand
-//in ideal world our programe keeps running and only in case of error we will exit
-//for that we can have a err case in select loop. is not a valid scenario in sample because
-// of assumptions made to generate taskStatus
+* sample.go just defines a sample cases with 4 or 5 tasks added to give the user a better understanding of the problem.
+* in ideal world our programe keeps running and only in case of error we will exit.for that we can have a err case in select loop. it is not a valid scenario in sample because of assumptions made to generate taskStatus
 
 * to run sampler just run `go run sample/sample.go`
 * to run actual problem `go run main.go`
