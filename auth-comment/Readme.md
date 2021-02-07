@@ -64,6 +64,7 @@ https://github.com/saiprasannasastry/DesignQuestions-Go/blob/5e859670fdd3e82a567
 <img src="https://github.com/saiprasannasastry/DesignQuestions-Go/blob/master/auth-comment/images/addcomments.png" width="600" height="400" />
 
 6 http://localhost:8001/getinteraction
+  * response message will be null if no comments are present
   * Return a response with all the top level comments for a particular post, a parent_path and commented user. Why a parent_path is returned is explained above.
   * Getinteraction requires a body with postname and createdby. Parent_path is optional. But the replies of both (with parent_path and without)are show below. Shows level1 reply and level 2 reply
 <img src="https://github.com/saiprasannasastry/DesignQuestions-Go/blob/master/auth-comment/images/get%20interaction.png" width="600" height="400" />
