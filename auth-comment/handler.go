@@ -68,7 +68,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error.Error())
 
 		tx.Rollback()
-		http.Error(w, err.Error.Error(), http.StatusInternalServerError)
+		http.Error(w, "the user is taken", http.StatusInternalServerError)
 		return
 	}
 	tx.Commit()
