@@ -7,6 +7,8 @@ The system assumes the following are available on the system. if not please use 
 * postman(easier to maintain sessions, and this is what I used for testing)
   * https://www.postman.com/downloads/
 * The ports 8001 and 5431 should be free.(5431 not necessary but 8001 is a must, since our api response includes local host to container communication)
+# Run the system
+* to interact with the system run `make build`
 # Auth system
 * after a user registers we give a user back jwt with token validaity of 5 minutes. if you wish to increase the time , change this to your preferred value 
 https://github.com/saiprasannasastry/DesignQuestions-Go/blob/5e859670fdd3e82a56733d00008179cf90fcdfb9/auth-comment/jwt.go#L62
