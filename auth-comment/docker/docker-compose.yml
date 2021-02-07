@@ -1,11 +1,10 @@
 version: '3'
 services:
   app:
-    container_name: photo
+    container_name: huddl
     image: ssastry22/atlas-repo:huddl
     ports: 
-      - 8080:8080 
-      - 5566:5566
+      - 8001:8001
     restart: on-failure
     volumes:
       - api:/usr/src/app/
@@ -24,7 +23,7 @@ services:
     image: ssastry22/atlas-repo:psql
     container_name: postgres-db
     ports:
-      - '5432:5432'
+      - '5431:5432'
     volumes:
       - database_postgres:/var/lib/postgresql/data
     networks:

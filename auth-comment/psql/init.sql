@@ -1,4 +1,4 @@
-create table users( user_id SERIAL, username VARCHAR(255) UNIQUE NOT NULL, PRIMARY KEY(username));
+create table users( password TEXT, username VARCHAR(255) UNIQUE NOT NULL, PRIMARY KEY(username));
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 create table posts(postid uuid DEFAULT uuid_generate_v4 (),postname VARCHAR(255) NOT NULL,

@@ -38,10 +38,9 @@ type Post struct {
 	Parent_path      string    `gorm:"-"`
 }
 
-//Credentials contains a struct to read the username and password from the request body
+//Users contains a struct to read the username and password from the request body
 
 type Users struct {
-	postid   string `json:"username", db:"postid"`
 	Username string `json:"username", db:"username"`
 	Password string `json:"password", db:"password"`
 }
@@ -64,14 +63,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	tx := db.Begin()
 	creds.Password = string(hashedPassword)
-	var errmsg string
-	if err := tx.Create(&creds); err.Error != nil {
 
-		errmsg = fmt.Sprintf("the user %v already exists in database", creds.Username)
-		log.Println(errmsg)
+	if err := tx.Create(&creds); err.Error != nil {
+		log.Println(err.Error.Error())
 
 		tx.Rollback()
-		http.Error(w, errmsg, http.StatusInternalServerError)
+		http.Error(w, err.Error.Error(), http.StatusInternalServerError)
 		return
 	}
 	tx.Commit()
@@ -162,7 +159,7 @@ func DeleteComments(w http.ResponseWriter, r *http.Request) {
 	var result Comments
 	var row *sql.Row
 	row = db.Table("comments").Select("*").Where("parent_path=?", posts.Parent_path).Row()
-	err = row.Scan(&result.Postid, &result.Comment, &result.Commented_user, &result.Comment_reaction, &result.Created_at, &result.Parent_path)
+	err = row.Scan(&result.Postid, &result.Comment, &result.Comment_reaction, &result.Commented_user, &result.Created_at, &result.Parent_path)
 	if err != nil {
 		//set error code
 		msg := "The row does not exists in comments"
@@ -182,18 +179,22 @@ func DeleteComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	created_user := posts.Createdby
+
 	if !(user == created_user || user == commented_user) {
 		http.Error(w, "user not authorized to delete the comment", http.StatusBadRequest)
 		return
 	}
 	db.Exec("delete from comments where parent_path ~ ?", result.Parent_path)
 	db.Exec("delete from comments where parent_path ~ ?", result.Parent_path+".*{1,10000}")
+	response := fmt.Sprintf("deleted %v and all its sub comments if any existed on post %v", result.Comment, result.Postid)
+	msg := message{StatusMessage: http.StatusOK, Message: response}
+	json.NewEncoder(w).Encode(msg)
 
 }
 
 //Delete Post deletes the post only if the post is created by the same user
 func DeletePosts(w http.ResponseWriter, r *http.Request) {
-	validated, user := validateToken(w, r)
+	validated, _ := validateToken(w, r)
 	if !validated {
 		http.Error(w, "could not validate the jwt", http.StatusBadRequest)
 		return
@@ -216,27 +217,32 @@ func DeletePosts(w http.ResponseWriter, r *http.Request) {
 	}
 	posts.Postid = fromString
 
-	row := db.Table("posts").Select("*").Where("postid=? AND created_by = ?", posts.Postid, user).Row()
-	if row == nil {
+	row := db.Table("posts").Select("postid").Where("postid=? ", posts.Postid).Row()
+	err = row.Scan(&posts.Postid)
+
+	if err != nil || err == sql.ErrNoRows {
 		//set error code
-		msg := "The row does not exists"
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		msg := "current user not authorized to delete the post"
+		http.Error(w, msg, http.StatusBadRequest)
 		log.Printf("%v:%v", msg, err)
 		return
 	}
 	db.Exec("delete from posts where postid =?", fromString)
+	response := fmt.Sprintf("delete post %v from database", posts.Postid)
+	msg := message{StatusMessage: http.StatusOK, Message: response}
+	json.NewEncoder(w).Encode(msg)
 }
 
 //GetPosts returns the postID for the user to trigger delete Request
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	validated, user := validateToken(w, r)
+	validated, _ := validateToken(w, r)
 	if !validated {
 		http.Error(w, "could not validate the jwt", http.StatusBadRequest)
 		return
 	}
 	var post Post
 
-	rows, err := db.Table("posts").Select("*").Where("createdby = ?", user).Rows()
+	rows, err := db.Table("posts").Select("*").Rows()
 	if err != nil {
 		log.Printf("Failed to get Rows %v", err)
 		http.Error(w, "could not gets posts for particular user", http.StatusBadRequest)
@@ -251,7 +257,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			log.Printf("%v :%v", msg, err)
 			return
 		}
-		m1 := M{"post_id": post.Postid, "post_name": post.Postname}
+		m1 := M{"post_id": post.Postid, "post_name": post.Postname, "created_by": post.Createdby}
 		myMapSlice = append(myMapSlice, m1)
 	}
 	msg := message{StatusMessage: http.StatusOK, Message: myMapSlice}
@@ -316,6 +322,9 @@ func Interact(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tx.Commit()
+	response := fmt.Sprintf("added reply %v to the parent comment", comment.Comment)
+	msg := message{http.StatusOK, response}
+	json.NewEncoder(w).Encode(msg)
 }
 
 //Add reaction adds reaction such as like, dislike into the DB
@@ -336,7 +345,8 @@ func AddReaction(w http.ResponseWriter, r *http.Request) {
 	comment.Comment_reaction = post.Comment_reaction
 	//comment.Parent_path = post.Parent_path
 	db.Model(&comment).Where("parent_path= ?", post.Parent_path).Updates(comment)
-	msg := message{StatusMessage: http.StatusOK, Message: "added post to database"}
+	response := fmt.Sprintf("added reaction %v on parent_path %v", comment.Comment_reaction, post.Parent_path)
+	msg := message{StatusMessage: http.StatusOK, Message: response}
 	json.NewEncoder(w).Encode(msg)
 }
 
@@ -402,7 +412,7 @@ func GetInteraction(w http.ResponseWriter, r *http.Request) {
 			log.Printf("%v:%v", msg, err)
 			return
 		}
-		m1 := M{"comment": comment.Comment, "comment_reaction": comment.Comment_reaction, "parent_path": comment.Parent_path, "reply": commentCount}
+		m1 := M{"comment": comment.Comment, "commented_by": comment.Commented_user, "comment_reaction": comment.Comment_reaction, "parent_path": comment.Parent_path, "reply": commentCount}
 		myMapSlice = append(myMapSlice, m1)
 	}
 

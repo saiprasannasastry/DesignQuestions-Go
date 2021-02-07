@@ -8,6 +8,7 @@ help:
 	@echo ''
 	@echo '    help               Show this help screen.'
 	@echo '    fmt                formats the source code.'
+	@echo '	   build			  creates the images and brings the container up.'
 	@echo '    clean              gets the containers down and removes all docker images.'
 
 fmt:

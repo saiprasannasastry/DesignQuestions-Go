@@ -3,4 +3,4 @@ FROM postgres
 ENV POSTGRES_PASSWORD postgres 
 ENV POSTGRES_DB postgres
 ENV POSTGRES_USER postgres
-COPY init.sql /docker-entrypoint-initdb.d/
+COPY psql/init.sql /docker-entrypoint-initdb.d/
