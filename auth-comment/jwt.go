@@ -121,7 +121,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	// In this case, a new token will only be issued if the old token is within
 	// 30 seconds of expiry. Otherwise, return a bad request status
 	if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
-		fmt.Println("refreshing within 30 seconds")
+		fmt.Println("refreshing before 30 seconds")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

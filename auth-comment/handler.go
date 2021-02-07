@@ -194,7 +194,7 @@ func DeleteComments(w http.ResponseWriter, r *http.Request) {
 
 //Delete Post deletes the post only if the post is created by the same user
 func DeletePosts(w http.ResponseWriter, r *http.Request) {
-	validated, _ := validateToken(w, r)
+	validated, user := validateToken(w, r)
 	if !validated {
 		http.Error(w, "could not validate the jwt", http.StatusBadRequest)
 		return
@@ -217,14 +217,18 @@ func DeletePosts(w http.ResponseWriter, r *http.Request) {
 	}
 	posts.Postid = fromString
 
-	row := db.Table("posts").Select("postid").Where("postid=? ", posts.Postid).Row()
-	err = row.Scan(&posts.Postid)
+	row := db.Table("posts").Select("*").Where("postid=? ", posts.Postid).Row()
+	err = row.Scan(&posts.Postid, &posts.Postname, &posts.Createdby)
 
 	if err != nil || err == sql.ErrNoRows {
 		//set error code
 		msg := "current user not authorized to delete the post"
 		http.Error(w, msg, http.StatusBadRequest)
 		log.Printf("%v:%v", msg, err)
+		return
+	}
+	if user != posts.Createdby {
+		http.Error(w, "user not authorized to delete the post", http.StatusBadRequest)
 		return
 	}
 	db.Exec("delete from posts where postid =?", fromString)
